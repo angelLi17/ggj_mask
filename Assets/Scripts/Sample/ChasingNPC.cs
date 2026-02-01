@@ -2,39 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChasingNPC3D : MonoBehaviour
+public class ChasingNPC : MonoBehaviour
 {
-    public GameObject playerObj;      // Drag the player's Rigidbody here (3D)
-    private Rigidbody rBody;
-
+    public Rigidbody2D playerRB;
+    Vector2 direction = Vector2.right;
+    Rigidbody2D rBody;
     public float speed = 3f;
-    public float chaseRange = 50f;
 
-    private void Start()
+    // Start is called before the first frame update
+    void Start()
     {
-        rBody = GetComponent<Rigidbody>();
+        rBody = GetComponent<Rigidbody2D>();
 
-        // If you want random speed, use a range (your 2D code had same min/max)
-        speed = Random.Range(1.5f, 2f);
+        speed = Random.Range(2.5f, 2.5f);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
     }
 
     private void FixedUpdate()
     {
-        if (playerObj == null) return;
+        //distance to player
+        float distance = Vector2.Distance(rBody.position, playerRB.position);
 
-        float distance = Vector3.Distance(rBody.position, playerObj.transform.position);
-
-        if (distance < chaseRange)
+        if(distance < 100f)
         {
-            Vector3 direction = (playerObj.transform.position - rBody.position).normalized;
+            //direction of player
+            direction = (playerRB.position - rBody.position).normalized;
 
-            // If you want the enemy to stay on the ground (no flying), uncomment:
-            // direction.y = 0f;
-            // direction = direction.normalized;
-
-            Vector3 newPos = rBody.position + direction * speed * Time.fixedDeltaTime;
+            Vector2 newPos = rBody.position + (direction * speed * Time.fixedDeltaTime);
             rBody.MovePosition(newPos);
         }
     }
-}
 
+}
