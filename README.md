@@ -1,2 +1,2 @@
 # ggj_mask
-game
+a wholesome horror survival-based crossyroad-esque 3D imposter game
