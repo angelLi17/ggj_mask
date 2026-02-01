@@ -157,7 +157,7 @@ Transform:
   m_GameObject: {fileID: 286217967118221259}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.00000011920929, z: -4}
+  m_LocalPosition: {x: 0.5, y: -0.31000006, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2825,9 +2825,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _characterController: {fileID: 7355467701441283946}
   _playerCamera: {fileID: 5018556063186697078}
-  runAccerelation: 50
+  runAcceleration: 0.25
   runSpeed: 4
+  sprintAcceleration: 0.5
+  sprintSpeed: 7
   drag: 30
+  gravity: 25
+  jumpSpeed: 1
+  movingThreshold: 0.01
   lookSenseH: 0.1
   lookSenseV: 0.1
   lookLimitV: 89
@@ -2843,6 +2848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 876f2206e56effa4198abc8f0571b047, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLocomotionInput
+  holdToSprint: 1
 --- !u!143 &7355467701441283946
 CharacterController:
   m_ObjectHideFlags: 0
