@@ -11,6 +11,14 @@ namespace AHH.FinalCharacterController
         {
             CurrentPlayerMovementState = playerMovementState;
         }
+
+        public bool InGroundedState()
+        {
+            return CurrentPlayerMovementState == PlayerMovementState.Running ||
+                   CurrentPlayerMovementState == PlayerMovementState.Sprinting||
+                   CurrentPlayerMovementState == PlayerMovementState.Idling ||
+                   CurrentPlayerMovementState == PlayerMovementState.Walking;
+        }
     }
     public enum PlayerMovementState
     {

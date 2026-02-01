@@ -13,21 +13,27 @@ namespace AHH.FinalCharacterController
         [SerializeField] private Camera _playerCamera;
 
         [Header("Base Movement")]
-        public float runAccerelation = 0.25f;
+        public float runAcceleration = 0.25f;
         public float runSpeed = 4f;
+        public float sprintAcceleration = 0.5f;
+        public float sprintSpeed = 7f;
         public float drag = 0.1f;
+        public float gravity = 25f;
+        public float jumpSpeed = 1.0f;
+        public float movingThreshold = 0.01f;
 
         [Header("Camera Settings")]
         public float lookSenseH = 0.1f;
         public float lookSenseV = 0.1f;
         public float lookLimitV = 89f;
-        public float movingThreshold = 0.01f;
         
         private PlayerLocomotionInput _playerLocomotionInput;
         private PlayerState _playerState;
         
         private Vector2 _cameraRotation = Vector2.zero;
         private Vector2 _playerTargetRotation = Vector2.zero;
+
+        private float _verticalVelocity = 0f;
         #endregion
         
         #region Startup
@@ -42,31 +48,69 @@ namespace AHH.FinalCharacterController
         private void Update()
         {
             UpdateMovementState();
+            HandleVerticalMovement();
             HandleLateralMovement();
         }
 
         private void UpdateMovementState()
         {
-            bool isMovementInput = _playerLocomotionInput.MovementInput != Vector2.zero;
+            bool isMovementInput = _playerLocomotionInput.MovementInput != Vector2.zero; //order matters
             bool isMovingLaterally = IsMovingLaterally();
+            bool isSprinting = _playerLocomotionInput.SprintToggledOn && isMovingLaterally; //!
+            bool isGrounded = IsGrounded();
 
-            PlayerMovementState lateralState = isMovingLaterally || isMovementInput ? PlayerMovementState.Running : PlayerMovementState.Idling;
+            PlayerMovementState lateralState = isSprinting ? PlayerMovementState.Sprinting :
+                                            isMovingLaterally || isMovementInput ? PlayerMovementState.Running : PlayerMovementState.Idling;
             _playerState.SetPlayerMovementState(lateralState);
+            
+            //Control Airborn State
+            if (!isGrounded && _characterController.velocity.y >= 0f)
+            {
+                _playerState.SetPlayerMovementState(PlayerMovementState.Jumping);
+            }
+            else if (!isGrounded && _characterController.velocity.y <= 0f)
+            {
+                _playerState.SetPlayerMovementState(PlayerMovementState.Falling);
+            }
         }
 
+        private void HandleVerticalMovement()
+        {
+            bool isGrounded = _playerState.InGroundedState();
+            
+            if (isGrounded && _verticalVelocity < 0)
+                _verticalVelocity = 0f;
+            
+            _verticalVelocity -= gravity * Time.deltaTime;
+
+            if (_playerLocomotionInput.JumpPressed && isGrounded)
+            {
+                _verticalVelocity += Mathf.Sqrt(jumpSpeed * 3 * gravity);
+            }
+        }
+        
         private void HandleLateralMovement()
         {
+            //Create quick reference for current state
+            bool isSprinting = _playerState.CurrentPlayerMovementState == PlayerMovementState.Sprinting;
+            bool isGrounded = _playerState.InGroundedState();
+            
+            //State dependent acceleration and speed 
+            float lateralAcceleration = isSprinting ? sprintAcceleration : runAcceleration;
+            float clamplateralMagnitude = isSprinting ? sprintSpeed : runSpeed;
+            
             Vector3 cameraForwardXZ = new Vector3(_playerCamera.transform.forward.x, 0f,  _playerCamera.transform.forward.z).normalized;
             Vector3 cameraRightXZ = new Vector3(_playerCamera.transform.right.x, 0f,  _playerCamera.transform.right.z).normalized;
             Vector3 movementDirection = cameraRightXZ * _playerLocomotionInput.MovementInput.x + cameraForwardXZ * _playerLocomotionInput.MovementInput.y;
             
-            Vector3 movementDelta = movementDirection * runAccerelation * Time.deltaTime;
+            Vector3 movementDelta = movementDirection * lateralAcceleration * Time.deltaTime;
             Vector3 newVelocity = _characterController.velocity + movementDelta;
             
             //Add drag to player
             Vector3 currentDrag = newVelocity.normalized * drag * Time.deltaTime;
             newVelocity = (newVelocity.magnitude > drag * Time.deltaTime) ? newVelocity - currentDrag : Vector3.zero;
-            newVelocity = Vector3.ClampMagnitude(newVelocity, runSpeed);
+            newVelocity = Vector3.ClampMagnitude(newVelocity, clamplateralMagnitude);
+            newVelocity.y += _verticalVelocity;
             
             //Move character (Unity suggests only calling this once per tick)
             _characterController.Move(newVelocity*Time.deltaTime);
@@ -83,6 +127,11 @@ namespace AHH.FinalCharacterController
             transform.rotation = Quaternion.Euler(0f, _playerTargetRotation.x, 0f);
 
             _playerCamera.transform.rotation = Quaternion.Euler(_cameraRotation.y, _cameraRotation.x, 0f);
+        }
+
+        private bool IsGrounded()
+        {
+            return _characterController.isGrounded;
         }
         #endregion
         
