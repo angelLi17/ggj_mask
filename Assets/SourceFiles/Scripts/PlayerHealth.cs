@@ -1,11 +1,16 @@
 using UnityEngine;
 
-public class PlayerHealth : Health
+public class NewMonoBehaviourScript : MonoBehaviour
 {
-    protected override void Die()
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
-        base.Die();
-        Debug.Log("Player died");
-        // Disable movement, show game over screen, etc.
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }
