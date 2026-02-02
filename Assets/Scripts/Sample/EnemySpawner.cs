@@ -51,7 +51,7 @@ public class EnemySpawner : MonoBehaviour
         var chaser = enemy.GetComponent<ChasingNPC3D>();
         if (chaser != null && player != null)
         {
-            chaser.player = player;
+            chaser.playerObj = player.gameObject;
         }
     }
 }
