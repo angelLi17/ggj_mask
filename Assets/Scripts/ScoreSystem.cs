@@ -5,7 +5,7 @@ public class ScoreSystem : MonoBehaviour
 {
     public static ScoreSystem instance;
     private float survivalTimer = 0f;
-    public int survivalPoints = 100;
+    public int survivalPoints = 10;
     public int points = 50;
     public int score = 0;
     public TextMeshProUGUI scoreText;
@@ -18,7 +18,7 @@ public class ScoreSystem : MonoBehaviour
     {
         survivalTimer += Time.deltaTime;
 
-        if (survivalTimer >= 30f)
+        if (survivalTimer >= 3f)
         {
             AddPoints(survivalPoints);
             survivalTimer = 0f;
