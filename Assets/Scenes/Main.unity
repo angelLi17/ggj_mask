@@ -5464,7 +5464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52ce54a0ff6b14d80b0d19e6c22da14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChasingNPC3D
-  player: {fileID: 2904966697492549305}
+  playerObj: {fileID: 0}
   speed: 3
   chaseRange: 50
 --- !u!33 &1812785735
